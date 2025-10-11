@@ -1,15 +1,16 @@
-
-
 namespace Ruler
 {
     public partial class Form1 : Form
     {
+        #region Private Fields
         private bool isDragging = false;
         private Point dragStartPoint;
 
         private const int sizeChangeValue = 10;
         private const int sizeHeight = 27;
+        #endregion
 
+        #region Constructors
         public Form1()
         {
             InitializeComponent();
@@ -17,7 +18,9 @@ namespace Ruler
             RestoreSizeWidth();
             RestorPanelColor();
         }
+        #endregion
 
+        #region Control Events
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
@@ -50,7 +53,7 @@ namespace Ruler
 
             if (e.KeyCode == Keys.D1)
             {
-                this.linePanel.BackColor = Color.Green;
+                this.linePanel.BackColor = Color.LimeGreen;
             }
 
             if (e.KeyCode == Keys.D2)
@@ -77,12 +80,22 @@ namespace Ruler
             }
         }
 
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            this.SaveFormPosition();
+            this.SaveSizeWidth();
+            this.SavePanelColor(this.linePanel.BackColor);
+        }
+        #endregion
+
+        #region Private Methods
         private void SavePanelColor(Color color)
         {
             string hexColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
             Properties.Settings.Default.LineColor = hexColor;
             Properties.Settings.Default.Save();
         }
+
         private void RestorPanelColor()
         {
             string hexColor = Properties.Settings.Default.LineColor;
@@ -138,19 +151,13 @@ namespace Ruler
             return false; // Position is outside all screens
         }
 
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            this.SaveFormPosition();
-            this.SaveSizeWidth();
-            this.SavePanelColor(this.linePanel.BackColor);
-        }
-
         private void SaveSizeWidth()
         {
             var currentWidth = this.Size.Width;
             Properties.Settings.Default.SizeWidth = currentWidth;
             Properties.Settings.Default.Save();
         }
+
         private void RestoreSizeWidth()
         {
             try
@@ -163,5 +170,6 @@ namespace Ruler
                 this.Size = new Size(759, sizeHeight);
             }
         }
+        #endregion
     }
 }

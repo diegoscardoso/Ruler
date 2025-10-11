@@ -31,12 +31,12 @@
             linePanel = new Panel();
             SuspendLayout();
             // 
-            // panel1
+            // linePanel
             // 
             linePanel.BackColor = Color.Yellow;
             linePanel.Location = new Point(-1, 2);
-            linePanel.Name = "panel1";
-            linePanel.Size = new Size(759, 4);
+            linePanel.Name = "linePanel";
+            linePanel.Size = new Size(759, 3);
             linePanel.TabIndex = 0;
             // 
             // Form1
