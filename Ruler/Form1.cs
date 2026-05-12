@@ -7,7 +7,7 @@ namespace Ruler
         private Point dragStartPoint;
 
         private const int sizeChangeValue = 10;
-        private const int sizeHeight = 27;
+        private const int sizeHeight = 10;
         #endregion
 
         #region Constructors

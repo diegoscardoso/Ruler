@@ -70,5 +70,41 @@ namespace Ruler.Properties {
                 this["SizeWidth"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int VerticalFormPosX {
+            get {
+                return ((int)(this["VerticalFormPosX"]));
+            }
+            set {
+                this["VerticalFormPosX"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string VerticalLineColor {
+            get {
+                return ((string)(this["VerticalLineColor"]));
+            }
+            set {
+                this["VerticalLineColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int VerticalSizeHeight {
+            get {
+                return ((int)(this["VerticalSizeHeight"]));
+            }
+            set {
+                this["VerticalSizeHeight"] = value;
+            }
+        }
     }
 }

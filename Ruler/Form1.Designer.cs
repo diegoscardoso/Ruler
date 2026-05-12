@@ -36,7 +36,7 @@
             linePanel.BackColor = Color.Yellow;
             linePanel.Location = new Point(-1, 2);
             linePanel.Name = "linePanel";
-            linePanel.Size = new Size(759, 3);
+            linePanel.Size = new Size(759, 1);
             linePanel.TabIndex = 0;
             // 
             // Form1
@@ -44,7 +44,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Khaki;
-            ClientSize = new Size(759, 27);
+            ClientSize = new Size(759, 11);
             ControlBox = false;
             Controls.Add(linePanel);
             FormBorderStyle = FormBorderStyle.None;
