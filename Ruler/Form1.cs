@@ -6,8 +6,9 @@ namespace Ruler
         private bool isDragging = false;
         private Point dragStartPoint;
 
-        private const int sizeChangeValue = 10;
-        private const int sizeHeight = 10;
+        private const int SizeChangeValue = 10;
+        private const int SizeHeight = 10;
+        private const int DefaultFormWidth = 759;
         #endregion
 
         #region Constructors
@@ -16,7 +17,7 @@ namespace Ruler
             InitializeComponent();
             RestoreFormPosition();
             RestoreSizeWidth();
-            RestorPanelColor();
+            RestorePanelColor();
         }
         #endregion
 
@@ -46,37 +47,36 @@ namespace Ruler
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Escape)
+            switch (e.KeyCode)
             {
-                this.Close(); // Close the form when Esc is pressed
-            }
+                case Keys.Escape:
+                    Close(); // Close the form when Esc is pressed
+                    break;
+                case Keys.D1:
+                    linePanel.BackColor = Color.LimeGreen;
+                    break;
+                case Keys.D2:
+                    linePanel.BackColor = Color.Red;
+                    break;
+                case Keys.Right:
+                {
+                    var newFormWidth = this.Size.Width + SizeChangeValue;
+                    var newPanelWidth = this.linePanel.Size.Width + SizeChangeValue;
 
-            if (e.KeyCode == Keys.D1)
-            {
-                this.linePanel.BackColor = Color.LimeGreen;
-            }
+                    this.Size = new Size(newFormWidth, this.Size.Height);
+                    this.linePanel.Size = new Size(newPanelWidth, this.linePanel.Size.Height);
+                    break;
+                }
+                case Keys.Left:
+                {
+                    // Prevent width from becoming zero or negative
+                    var newFormWidth = Math.Max(1, this.Size.Width - SizeChangeValue);
+                    var newPanelWidth = Math.Max(1, this.linePanel.Size.Width - SizeChangeValue);
 
-            if (e.KeyCode == Keys.D2)
-            {
-                this.linePanel.BackColor = Color.Red;
-            }
-
-            if (e.KeyCode == Keys.Right)
-            {
-                var actualFormSize = this.Size;
-                var actualPanelSize = this.linePanel.Size;
-
-                this.Size = new Size(actualFormSize.Width + sizeChangeValue, actualFormSize.Height);
-                this.linePanel.Size = new Size(actualPanelSize.Width + sizeChangeValue, actualPanelSize.Height);
-            }
-
-            if (e.KeyCode == Keys.Left)
-            {
-                var actualSize = this.Size;
-                var actualPanelSize = this.linePanel.Size;
-
-                this.Size = new Size(actualSize.Width - sizeChangeValue, actualSize.Height);
-                this.linePanel.Size = new Size(actualPanelSize.Width - sizeChangeValue, actualPanelSize.Height);
+                    this.Size = new Size(newFormWidth, this.Size.Height);
+                    this.linePanel.Size = new Size(newPanelWidth, this.linePanel.Size.Height);
+                    break;
+                }
             }
         }
 
@@ -85,6 +85,8 @@ namespace Ruler
             this.SaveFormPosition();
             this.SaveSizeWidth();
             this.SavePanelColor(this.linePanel.BackColor);
+
+            Properties.Settings.Default.Save();
         }
         #endregion
 
@@ -93,10 +95,9 @@ namespace Ruler
         {
             string hexColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
             Properties.Settings.Default.LineColor = hexColor;
-            Properties.Settings.Default.Save();
         }
 
-        private void RestorPanelColor()
+        private void RestorePanelColor()
         {
             string hexColor = Properties.Settings.Default.LineColor;
             try
@@ -113,10 +114,12 @@ namespace Ruler
 
         private void SaveFormPosition()
         {
-            // Save current position to settings
-            Properties.Settings.Default.FormPosX = this.Location.X;
-            Properties.Settings.Default.FormPosY = this.Location.Y;
-            Properties.Settings.Default.Save(); // Persist settings
+            // Save current position to settings. Only save when window is in normal state
+            if (this.WindowState == FormWindowState.Normal)
+            {
+                Properties.Settings.Default.FormPosX = this.Location.X;
+                Properties.Settings.Default.FormPosY = this.Location.Y;
+            }
         }
 
         public void RestoreFormPosition()
@@ -155,7 +158,6 @@ namespace Ruler
         {
             var currentWidth = this.Size.Width;
             Properties.Settings.Default.SizeWidth = currentWidth;
-            Properties.Settings.Default.Save();
         }
 
         private void RestoreSizeWidth()
@@ -163,11 +165,16 @@ namespace Ruler
             try
             {
                 var lastWidth = Properties.Settings.Default.SizeWidth;
-                this.Size = new Size(lastWidth, sizeHeight);
+                if (lastWidth < 1)
+                {
+                    lastWidth = DefaultFormWidth; // Use constant instead of magic number
+                }
+
+                this.Size = new Size(lastWidth, SizeHeight);
             }
             catch
             {
-                this.Size = new Size(759, sizeHeight);
+                this.Size = new Size(DefaultFormWidth, SizeHeight); // Use constant instead of magic number
             }
         }
         #endregion
