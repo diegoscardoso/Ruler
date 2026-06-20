@@ -77,6 +77,9 @@ namespace Ruler
                     this.linePanel.Size = new Size(newPanelWidth, this.linePanel.Size.Height);
                     break;
                 }
+                case Keys.N:
+                    new Form1().Show();
+                    break;
             }
         }
 
