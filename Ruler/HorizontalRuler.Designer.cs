@@ -1,6 +1,6 @@
 ﻿namespace Ruler
 {
-    partial class Form1
+    partial class HorizontalRuler
     {
         /// <summary>
         ///  Required designer variable.
@@ -38,9 +38,9 @@
             linePanel.Name = "linePanel";
             linePanel.Size = new Size(759, 1);
             linePanel.TabIndex = 0;
-            // 
-            // Form1
-            // 
+            //
+            // HorizontalRuler
+            //
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Khaki;
@@ -50,16 +50,16 @@
             FormBorderStyle = FormBorderStyle.None;
             MaximizeBox = false;
             MinimizeBox = false;
-            Name = "Form1";
+            Name = "HorizontalRuler";
             SizeGripStyle = SizeGripStyle.Hide;
             StartPosition = FormStartPosition.Manual;
             TopMost = true;
             TransparencyKey = Color.Khaki;
-            FormClosing += Form1_FormClosing;
-            KeyDown += Form1_KeyDown;
-            MouseDown += Form1_MouseDown;
-            MouseMove += Form1_MouseMove;
-            MouseUp += Form1_MouseUp;
+            FormClosing += HorizontalRuler_FormClosing;
+            KeyDown += HorizontalRuler_KeyDown;
+            MouseDown += HorizontalRuler_MouseDown;
+            MouseMove += HorizontalRuler_MouseMove;
+            MouseUp += HorizontalRuler_MouseUp;
             ResumeLayout(false);
 
         }

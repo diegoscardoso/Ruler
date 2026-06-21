@@ -1,6 +1,6 @@
 namespace Ruler
 {
-    public partial class Form1 : Form
+    public partial class HorizontalRuler : Form
     {
         #region Private Fields
         private bool isDragging = false;
@@ -12,7 +12,7 @@ namespace Ruler
         #endregion
 
         #region Constructors
-        public Form1()
+        public HorizontalRuler()
         {
             InitializeComponent();
             RestoreFormPosition();
@@ -22,7 +22,7 @@ namespace Ruler
         #endregion
 
         #region Control Events
-        private void Form1_MouseDown(object sender, MouseEventArgs e)
+        private void HorizontalRuler_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
@@ -31,7 +31,7 @@ namespace Ruler
             }
         }
 
-        private void Form1_MouseMove(object sender, MouseEventArgs e)
+        private void HorizontalRuler_MouseMove(object sender, MouseEventArgs e)
         {
             if (isDragging)
             {
@@ -40,12 +40,12 @@ namespace Ruler
             }
         }
 
-        private void Form1_MouseUp(object sender, MouseEventArgs e)
+        private void HorizontalRuler_MouseUp(object sender, MouseEventArgs e)
         {
             isDragging = false;
         }
 
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        private void HorizontalRuler_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode)
             {
@@ -78,12 +78,12 @@ namespace Ruler
                     break;
                 }
                 case Keys.N:
-                    new Form1().Show();
+                    new HorizontalRuler().Show();
                     break;
             }
         }
 
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        private void HorizontalRuler_FormClosing(object sender, FormClosingEventArgs e)
         {
             this.SaveFormPosition();
             this.SaveSizeWidth();
