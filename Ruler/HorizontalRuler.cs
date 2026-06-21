@@ -78,7 +78,7 @@ namespace Ruler
                     break;
                 }
                 case Keys.N:
-                    new HorizontalRuler().Show();
+                    Program.CreateNewRuler();
                     break;
             }
         }
