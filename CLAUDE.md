@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Ruler is a Windows desktop utility: a thin, frameless, always-on-top, draggable horizontal line used to visually measure pixel distances on screen. Built with .NET 8 WinForms, no external dependencies.
+Ruler is a Windows desktop utility for visually measuring pixel distances on screen. The user draws free-direction lines over the desktop (click-drag-release), which stay on top of every application and show their length in pixels. Built with .NET 8 WinForms plus native Win32 layered-window APIs, no external dependencies.
 
 ## Build & run
 
@@ -19,20 +19,16 @@ There are no tests and no CI configuration in this repo.
 
 The solution (`Ruler.sln`) contains a single project: `Ruler\Ruler.csproj` (`net8.0-windows`, WinForms, `StartupObject` = `Ruler.Program`).
 
-- **`Program.cs`** — entry point, launches `Form1`.
-- **`Form1.cs`** — the entire app. A borderless, `TopMost`, draggable form containing one `Panel` (`linePanel`) rendered as a thin colored line; the surrounding form chrome is invisible via `TransparencyKey` (khaki). All behavior lives in `Form1_KeyDown`/`Form1_MouseDown/Move/Up`/`Form1_FormClosing`:
-  - Drag to move (left mouse button)
-  - `Esc` closes the ruler
-  - `1` / `2` set line color to LimeGreen / Red
-  - `Left` / `Right` arrows shrink/grow width by `SizeChangeValue` (10px), clamped to a minimum of 1px
-  - `N` opens an additional independent `Form1` instance (`new Form1().Show()`)
-  - Position, width, and line color persist across sessions via `Properties.Settings.Default`, saved in `Form1_FormClosing` and restored in the constructor (`RestoreFormPosition`/`RestoreSizeWidth`/`RestorePanelColor`)
-- **`Properties/Settings.settings`** — defines the persisted user settings (`FormPosX`, `FormPosY`, `LineColor`, `SizeWidth`, plus unused `VerticalFormPosX`/`VerticalLineColor`/`VerticalSizeHeight` provisioned for the vertical ruler below).
+- **`Program.cs`** — entry point. Sets `HighDpiMode.PerMonitorV2` (so all coordinates are physical pixels — the ruler measures real pixels) and runs a single `RulerOverlay`.
+- **`RulerOverlay.cs`** — the entire app. A borderless, `TopMost` form covering the whole virtual screen (all monitors), created with `WS_EX_LAYERED` and rendered via `UpdateLayeredWindow` (see `NativeMethods.cs`). Every frame is drawn with GDI+ into a 32bpp ARGB bitmap and pushed to the window; there is no WM_PAINT path and no child controls.
+  - **Per-pixel hit-testing is the core trick**: pixels with alpha 0 are click-through (mouse goes to the app below); pixels with alpha ≥ 1 receive mouse input. `HitOnlyColor` (alpha 1, visually imperceptible) is used to (a) fill the whole background while drawing is armed, so a drag can start anywhere, and (b) widen the clickable stroke/handles around the thin visible lines.
+  - Holds a `List<MeasureLine>` (Start/End/Color) plus a `selected` line, which is the only one showing endpoint handles. Drawing is "armed" (`newLineArmed` or empty list) → background captures the mouse and press-drag-release creates a line (`DragMode.Drawing`), which becomes selected. Otherwise the background is alpha 0 and only lines intercept clicks: clicking selects the nearest line (`FindNearestLine`) and drags it (`MoveLine`); the selected line's endpoint handles resize it (`MoveStart`/`MoveEnd`).
+  - Keys (require focus — any click on the overlay/lines calls `Activate()`): `N` arms drawing of an additional line; `Esc` cancels an armed `N`, else deletes the selected line, else (no lines left) exits the app; `1`/`2` set the selected line's color (LimeGreen/Red) and the default for new lines.
+  - A length label ("N px") is drawn beside each line's midpoint.
+- **`NativeMethods.cs`** — P/Invoke for `UpdateLayeredWindow`, `GetDC`, `CreateCompatibleDC`, `SelectObject`, etc. `SetLayeredWindowBitmap(form, bitmap)` pushes the ARGB bitmap with `AC_SRC_ALPHA` blending.
 
-### Known dead/unfinished code — do not assume these are wired up
+Nothing is persisted across sessions (the old `Properties.Settings` mechanism was removed along with the previous thin-form implementation).
 
-- **`VerticalForm.cs`** — a stub for a not-yet-implemented vertical ruler counterpart to `Form1`. The Designer file is still the bare WinForms template (no `linePanel`, no event handlers). It is never instantiated anywhere. Settings fields exist for it, but no logic does.
-- **`Ruler.cs`** — a leftover empty WinForms project-template scaffold (named after the project itself). Never instantiated or referenced.
+### Known dead/unfinished code — do not assume this is wired up
+
 - **`RulerWPF/`** — a separate WPF project sitting alongside `Ruler/` in the repo, but **not included in `Ruler.sln`**. It's just the default WPF template (`MainWindow.xaml` with one tweaked `Grid` opacity) — no real logic. Treat as an abandoned/parked experiment unless explicitly asked to revive it.
-
-`Form1`, `VerticalForm`, and `Ruler` have no shared base class despite the apparent intent for `VerticalForm` to mirror `Form1`.
