@@ -27,10 +27,12 @@ namespace Ruler
             public Point Start;
             public Point End;
             public Color Color;
+            public int Width;
         }
 
         #region Private Fields
-        private const int LineWidth = 2;
+        private const int MinLineWidth = 1;
+        private const int MaxLineWidth = 10;
         private const int HandleRadius = 5;
         private const int GrabRadius = 10;
         private const int MinLineLength = 3;
@@ -46,6 +48,7 @@ namespace Ruler
         private DragMode drag = DragMode.None;
         private Point lastMousePos;
         private Color defaultColor = Color.LimeGreen;
+        private int defaultWidth = 1;
 
         private Bitmap? surface;
         private readonly Font labelFont = new Font("Segoe UI", 9f, FontStyle.Bold);
@@ -91,7 +94,7 @@ namespace Ruler
             if (lines.Count == 0 || newLineArmed)
             {
                 newLineArmed = false;
-                var line = new MeasureLine { Start = e.Location, End = e.Location, Color = defaultColor };
+                var line = new MeasureLine { Start = e.Location, End = e.Location, Color = defaultColor, Width = defaultWidth };
                 lines.Add(line);
                 selected = line;
                 drag = DragMode.Drawing;
@@ -224,6 +227,16 @@ namespace Ruler
                 case Keys.D2:
                     SetColor(Color.Red);
                     break;
+
+                case Keys.Oemplus:
+                case Keys.Add:
+                    ChangeWidth(+1);
+                    break;
+
+                case Keys.OemMinus:
+                case Keys.Subtract:
+                    ChangeWidth(-1);
+                    break;
             }
         }
 
@@ -247,6 +260,18 @@ namespace Ruler
                 selected.Color = color;
                 Render();
             }
+        }
+
+        private void ChangeWidth(int delta)
+        {
+            if (selected == null) return;
+
+            int newWidth = Math.Clamp(selected.Width + delta, MinLineWidth, MaxLineWidth);
+            if (newWidth == selected.Width) return;
+
+            selected.Width = newWidth;
+            defaultWidth = newWidth;
+            Render();
         }
 
         private void UpdateIdleCursor()
@@ -308,7 +333,7 @@ namespace Ruler
                 g.DrawLine(hitPen, line.Start, line.End);
             }
 
-            using (var pen = new Pen(line.Color, LineWidth))
+            using (var pen = new Pen(line.Color, line.Width))
             {
                 g.DrawLine(pen, line.Start, line.End);
             }
