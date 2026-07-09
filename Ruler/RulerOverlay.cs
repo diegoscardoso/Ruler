@@ -49,6 +49,7 @@ namespace Ruler
         private Point lastMousePos;
         private Color defaultColor = Color.LimeGreen;
         private int defaultWidth = 1;
+        private bool showLabels;
 
         private Bitmap? surface;
         private readonly Font labelFont = new Font("Segoe UI", 9f, FontStyle.Bold);
@@ -228,6 +229,19 @@ namespace Ruler
                     SetColor(Color.Red);
                     break;
 
+                case Keys.P:
+                    showLabels = !showLabels;
+                    Render();
+                    break;
+
+                case Keys.H:
+                    SnapSelected(horizontal: true);
+                    break;
+
+                case Keys.V:
+                    SnapSelected(horizontal: false);
+                    break;
+
                 case Keys.Oemplus:
                 case Keys.Add:
                     ChangeWidth(+1);
@@ -260,6 +274,32 @@ namespace Ruler
                 selected.Color = color;
                 Render();
             }
+        }
+
+        /// <summary>
+        /// Straightens the selected line, keeping its length and using the
+        /// leftmost endpoint as the fixed anchor. Horizontal extends to the
+        /// right; vertical keeps the other endpoint's up/down direction.
+        /// </summary>
+        private void SnapSelected(bool horizontal)
+        {
+            if (selected == null) return;
+
+            bool startIsLeft = selected.Start.X <= selected.End.X;
+            Point anchor = startIsLeft ? selected.Start : selected.End;
+            Point other = startIsLeft ? selected.End : selected.Start;
+
+            int length = (int)Math.Round(Distance(selected.Start, selected.End));
+            if (length == 0) return;
+
+            Point newOther = horizontal
+                ? new Point(anchor.X + length, anchor.Y)
+                : new Point(anchor.X, anchor.Y + (other.Y >= anchor.Y ? length : -length));
+
+            if (startIsLeft) selected.End = newOther;
+            else selected.Start = newOther;
+
+            Render();
         }
 
         private void ChangeWidth(int delta)
@@ -344,7 +384,10 @@ namespace Ruler
                 DrawHandle(g, line.End, line.Color);
             }
 
-            DrawLengthLabel(g, line);
+            if (showLabels)
+            {
+                DrawLengthLabel(g, line);
+            }
         }
 
         private void DrawHandle(Graphics g, Point p, Color color)
