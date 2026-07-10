@@ -187,6 +187,21 @@ namespace Ruler
             Render();
         }
 
+        protected override void OnDeactivate(EventArgs e)
+        {
+            base.OnDeactivate(e);
+
+            // Focus went to another window (user clicked outside the lines):
+            // deselect so the endpoint handles disappear. Clicking a line again
+            // reactivates the overlay and reselects it (see OnMouseDown).
+            if (selected != null || drag != DragMode.None)
+            {
+                drag = DragMode.None;
+                selected = null;
+                Render();
+            }
+        }
+
         protected override void OnKeyDown(KeyEventArgs e)
         {
             base.OnKeyDown(e);
